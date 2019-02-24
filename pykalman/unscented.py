@@ -84,8 +84,18 @@ def moments2points(moments, alpha=None, beta=None, kappa=None):
     if kappa is None:
       kappa = 3.0 - n_dim
 
+    # AW - need to check if the matrix is positive semi-definate.
+    vals, vecs = np.linalg.eig(sigma)
+    psd = np.all(vals > 0)
+    
+    if psd:
+        sigma_psd = sigma
+    else:
+        eps = 1e-08
+        sigma_psd = np.matmul(np.matmul(vecs, np.diag(np.clip(vals, eps, np.inf))), vecs.T)
+
     # compute sqrt(sigma)
-    sigma2 = linalg.cholesky(sigma).T
+    sigma2 = linalg.cholesky(sigma_psd).T
 
     # Calculate scaling factor for all off-center points
     lamda = (alpha * alpha) * (n_dim + kappa) - n_dim
