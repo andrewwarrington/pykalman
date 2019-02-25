@@ -151,9 +151,10 @@ def unscented_transform(points, f=None, points_noise=None, sigma_noise=None):
     (points, weights_mean, weights_covariance) = points
 
     # propagate points through f
+    # TODO - AW - this is where the parallelism should come in.
     if f is not None:
         if points_noise is None:
-            points_pred = [f(points[i]) for i in range(n_points)]
+            points_pred = f(points)
         else:
             points_noise = points_noise.points
             points_pred = [f(points[i], points_noise[i]) for i in range(n_points)]
